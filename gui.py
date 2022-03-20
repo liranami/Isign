@@ -11,7 +11,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
 
 
 OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path("./assets")
+ASSETS_PATH = OUTPUT_PATH / Path("")
 
 
 def relative_to_assets(path: str) -> Path:
@@ -22,6 +22,10 @@ window = Tk()
 
 window.geometry("1024x600")
 window.configure(bg = "#FFFFFF")
+
+
+
+
 
 
 canvas = Canvas(
@@ -52,7 +56,7 @@ canvas.create_rectangle(
     outline="")
 
 button_image_1 = PhotoImage(
-    file=relative_to_assets("button_1.png"))
+    file=relative_to_assets("assets/start_btn.png"))
 button_1 = Button(
     image=button_image_1,
     borderwidth=0,
@@ -68,7 +72,7 @@ button_1.place(
 )
 
 button_image_2 = PhotoImage(
-    file=relative_to_assets("button_2.png"))
+    file=relative_to_assets("assets/stop_btn.png"))
 button_2 = Button(
     image=button_image_2,
     borderwidth=0,
@@ -84,7 +88,7 @@ button_2.place(
 )
 
 entry_image_1 = PhotoImage(
-    file=relative_to_assets("entry_1.png"))
+    file=relative_to_assets("assets/entry_1.png"))
 entry_bg_1 = canvas.create_image(
     804.0,
     415.0,
