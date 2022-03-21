@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import main
 import cv2
-
+from showVideoOnGui import showVid
 
 def clearCapture(capture):
     capture.release()
@@ -59,9 +59,10 @@ def changeToUserWin(oldWin):
     startBtn_image = PhotoImage(file='assets/start_btn.png')
     stopBtn_image = PhotoImage(file='assets/stop_btn.png')
     goBack_image = PhotoImage(file='assets/goBack.png')
+    video = showVid(userGui)
     startBtn = Button(image=startBtn_image, borderwidth=0, highlightthickness=0,
-                      command=lambda: print('start btn click'), relief="flat")
-    stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command=lambda: print('stop btn click'),
+                      command=lambda: video.showVideo(clicked.get()[1]), relief="flat")
+    stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command=video.stopShowVideo(True),
                      relief="flat")
     goBackBtn = Button(image=goBack_image, borderwidth=0, highlightthickness=0, command=lambda: main.main(userGui),
                        relief="flat")
