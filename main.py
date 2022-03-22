@@ -1,6 +1,6 @@
 from tkinter import *
 from PIL import Image, ImageTk
-import userGUI
+import userGUI, developerLogin
 
 def main(win=None):
     if win:
@@ -26,7 +26,7 @@ def main(win=None):
     userBtn = Button(image=userBtn_image, borderwidth=0, highlightthickness=0,
                      command=lambda: userGUI.changeToUserWin(window), relief="flat")
     developerBtn = Button(image=developerBtn_image, borderwidth=0, highlightthickness=0,
-                          command=lambda: print('developer btn click'), relief="flat")
+                          command=lambda: developerLogin.logIn(window), relief="flat")
     userBtn.place(x=660, y=390, width=208, height=60)
     developerBtn.place(x=660, y=250, width=208, height=60)
     canvas.create_text(721, 191, anchor="nw", text="You are", fill="#000000", font=("Roboto", 24 * -1))

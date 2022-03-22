@@ -3,12 +3,12 @@ from tkinter import ttk
 from tkinter import messagebox
 import main
 import cv2
-from showVideoOnGui import showVid
+import showVideoOnGui
+from threading import Thread, Lock
 
 def clearCapture(capture):
     capture.release()
     cv2.destroyAllWindows()
-
 
 def camerasConnected():
     n = 0
@@ -54,15 +54,14 @@ def changeToUserWin(oldWin):
         clicked.set(options[0])
     chooseCamera = ttk.OptionMenu(userGui, clicked, options)
     chooseCamera.place(x=680, y=150, width=100, height=30)
-
+    vid = Thread()
     # create start/stop Btn - and texts
     startBtn_image = PhotoImage(file='assets/start_btn.png')
     stopBtn_image = PhotoImage(file='assets/stop_btn.png')
     goBack_image = PhotoImage(file='assets/goBack.png')
-    video = showVid(userGui)
     startBtn = Button(image=startBtn_image, borderwidth=0, highlightthickness=0,
-                      command=lambda: video.showVideo(clicked.get()[1]), relief="flat")
-    stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command=video.stopShowVideo(True),
+                      command=lambda: showVideoOnGui.showVideo(clicked.get()[1], userGui), relief="flat")
+    stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command=showVideoOnGui.stopShowVideo(True),
                      relief="flat")
     goBackBtn = Button(image=goBack_image, borderwidth=0, highlightthickness=0, command=lambda: main.main(userGui),
                        relief="flat")
