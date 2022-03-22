@@ -25,11 +25,11 @@ def camerasConnected():
     return n
 
 
-def changeToUserWin(oldWin):
+def changeToDevWin(oldWin):
     oldWin.destroy()
     userGui = Tk()
     userGui.geometry("1024x600")
-    userGui.title("Isign - user")
+    userGui.title("Isign - developer")
     userGui.configure(bg="#FFFFFF")
     canvas = Canvas(userGui, bg="#FFFFFF", height=600, width=1024, bd=0, highlightthickness=0, relief="ridge")
     canvas.place(x=0, y=0)

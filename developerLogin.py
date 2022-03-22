@@ -1,16 +1,15 @@
 from tkinter import *
 from PIL import Image, ImageTk
 import main
-
+import devGUI
 
 def goToGui():
-    pass  # TODO : create dev gui
-    print("enter")
+    devGUI
 
 
-def validUsers(user, password):
+def validUsers(user, password, logInGui):
     if user.get().lower() == 'liran' and password.get() == 'pass':
-        goToGui()
+        devGUI.changeToDevWin(logInGui)
     else:
         print("bye!")
 
@@ -48,7 +47,7 @@ def logIn(oldWin):
     goBackBtn = Button(image=goBack_image, borderwidth=0, highlightthickness=0, command=lambda: main.main(logInGui),
                        relief="flat")
     logInBtn = Button(image=logInBtn_image, borderwidth=0, highlightthickness=0,
-                      command=lambda: validUsers(username, password), relief="flat")
+                      command=lambda: validUsers(username, password, logInGui), relief="flat")
     goBackBtn.place(x=26, y=32, width=22, height=20)
     logInBtn.place(x=705, y=426, width=158, height=52)
     logInGui.resizable(False, False)

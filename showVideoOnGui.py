@@ -55,7 +55,7 @@ def stopShowVideo(tf):
 def showVideo(cameraNum, window):
     global stop
     capture = cv2.VideoCapture(int(cameraNum) - 1)
-    canvas = tkinter.Canvas(window, width=512, height=410)
+    canvas = tkinter.Canvas(window, width=516, height=448)
     canvas.place(x=28, y=107)
     with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
         while stop:
