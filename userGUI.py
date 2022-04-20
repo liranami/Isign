@@ -51,15 +51,15 @@ def changeToUserWin(oldWin):
     else:
         for i in range(numOfCams):
             options.append(i + 1)
-        clicked.set(options[0])
-    chooseCamera = ttk.OptionMenu(userGui, clicked, options)
+        #clicked.set(options[0])
+    chooseCamera = ttk.OptionMenu(userGui, clicked, options[0], *options)
     chooseCamera.place(x=680, y=150, width=100, height=30)
     # create start/stop Btn - and texts
     startBtn_image = PhotoImage(file='assets/start_btn.png')
     stopBtn_image = PhotoImage(file='assets/stop_btn.png')
     goBack_image = PhotoImage(file='assets/goBack.png')
     startBtn = Button(image=startBtn_image, borderwidth=0, highlightthickness=0,
-                      command=lambda: showVideoOnGui.showVideo(clicked.get()[1], userGui), relief="flat")
+                      command=lambda: showVideoOnGui.showVideo(clicked.get(), userGui), relief="flat")
     stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command=showVideoOnGui.stopShowVideo(True),
                      relief="flat")
     goBackBtn = Button(image=goBack_image, borderwidth=0, highlightthickness=0, command=lambda: main.main(userGui),

@@ -20,7 +20,7 @@ def main(win=None):
     logo_img = ImageTk.PhotoImage(logo_resize)
     logo = canvas.create_image(240.0, 300.0, image=logo_img)
     # end
-    # create start/stop Btn - and texts
+    # create Developer/User Btn - and texts
     userBtn_image = PhotoImage(file='assets/user.png')
     developerBtn_image = PhotoImage(file='assets/developer.png')
     userBtn = Button(image=userBtn_image, borderwidth=0, highlightthickness=0,
