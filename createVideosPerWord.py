@@ -5,7 +5,7 @@ import time
 import mediapipe as mp
 from matplotlib import pyplot as plt
 
-ACTIONS = np.array(['שלום', 'תודה'])
+ACTIONS = np.array(['שלום'])
 mp_holistic = mp.solutions.holistic   # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
 
@@ -54,10 +54,13 @@ for sing in sing_language_actions:
 #    print("Error opening video stream or file")
 
 capture = cv2.VideoCapture(0)
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+
 # Set MediaPipe model
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
     for sing in sing_language_actions:
         for video in range(numbers_of_videos):
+            out = cv2.VideoWriter(sing+str(video)+'.avi', fourcc, 20.0, (640, 480))
             for frame_number in range(video_length):
 
                 ret, frame = capture.read()                                  # Read frame from webcam
@@ -73,8 +76,10 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
                 keypoints = extract_keypoints(results)
                 np_path = os.path.join(DATA_PATH, sing, str(video), str(frame_number))
                 np.save(np_path, keypoints)
+                out.write(frame)
                 cv2.imshow('camera', frame)                                  # Show to screen the frame
                 if cv2.waitKey(10) == ord('q'):
                     break
     capture.release()
+    out.release()
     cv2.destroyAllWindows()
