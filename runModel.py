@@ -1,14 +1,12 @@
-import cv2
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
 import numpy as np
-import os
-import time
+import cv2
 import mediapipe as mp
-from matplotlib import pyplot as plt
 
-ACTIONS = np.array(['השעה'])
 mp_holistic = mp.solutions.holistic   # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
-
+ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
 
 def mediapipe_detection(image, model):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Color Convert from BGR(cv2) to RBG
@@ -17,6 +15,7 @@ def mediapipe_detection(image, model):
     image.flags.writeable = True                    # Image is now writeable
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Color Convert from RBG to BGR(cv2)
     return image, results
+
 
 # Draw face, pose and hands connections
 def show_landmarks(image, results):
@@ -29,6 +28,7 @@ def show_landmarks(image, results):
     mp_show.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
                            mp_show.DrawingSpec(color=(180,100,100), thickness=2, circle_radius=2))
 
+
 def extract_keypoints(results):
     pose = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten()\
         if results.pose_landmarks else np.zeros(33*4)
@@ -40,56 +40,55 @@ def extract_keypoints(results):
         if results.face_landmarks else np.zeros(468*3)
     return np.concatenate([pose, face, left_hand, right_hand])  # (1662,)
 
+model = Sequential()
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(60, 1629)))
+model.add(LSTM(128, return_sequences=True, activation='relu'))
+model.add(LSTM(64, return_sequences=False, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
-DATA_PATH = os.path.join('C:\\Sign_Language_Data')
-sing_language_actions = ACTIONS  # Actions is the words we will translate
-numbers_of_videos = 20  # Number of videos to each word
-video_length = 60       # Frames we take to analyze
-
-# Create 30 videos of each word,
-# Each word will have folder and inside 30 different videos (with 30 frame - 1662 DATA each)
-for sing in sing_language_actions:
-    for video in range(numbers_of_videos):
-        try:
-            os.makedirs(os.path.join(DATA_PATH, sing, str(video)))
-        except:
-            pass
+model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
 
 
-
-#cap = cv2.VideoCapture('chaplin.mp4')
-
-# Check if camera opened successfully
-#if (cap.isOpened() == False):
-#    print("Error opening video stream or file")
-
+sequence = []
+sentence = []
+predictions = []
+threshold = 0.2
 capture = cv2.VideoCapture(0)
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-
 # Set MediaPipe model
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
-    for sing in sing_language_actions:
-        for video in range(numbers_of_videos):
-            out = cv2.VideoWriter(DATA_PATH+'\\'+sing+'\\'+str(video)+'.avi', fourcc, 20.0, (640, 480))
-            for frame_number in range(video_length):
+    while capture.isOpened():
+        ret, frame = capture.read()                                  # Read frame from webcam
+        frame, results = mediapipe_detection(frame, holistic_model)  # Make detections
+        #show_landmarks(frame, results)                               # Draw the landmarks
+        keypoints = extract_keypoints(results)                       # wxtract key point from image(camera)
+        sequence.append(keypoints)
+        sequence = sequence[-60:]
+        if len(sequence) == 60:
+            res = model.predict(np.expand_dims(sequence, axis=0))[0]
+            print(ACTIONS[np.argmax(res)], res)
+            predictions.append(np.argmax(res))
 
-                ret, frame = capture.read()                                  # Read frame from webcam
-                frame, results = mediapipe_detection(frame, holistic_model)  # Make detections
+            if np.unique(predictions[-20:])[0] == np.argmax(res):
+                if res[np.argmax(res)] > threshold:
+                    if len(sentence) > 0:
+                        if ACTIONS[np.argmax(res)] != sentence[-1]:
+                            sentence.append(ACTIONS[np.argmax(res)])
+                            print(sentence)
+                    else:
+                        sentence.append(ACTIONS[np.argmax(res)])
+                        print(sentence)
+        if len(sentence) > 8:
+            sentence = sentence[-8:]
 
-                cv2.putText(frame, 'Collecting for {} video number {}'.format(sing, video), (15, 12),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
-                if frame_number == 0:
-                    cv2.putText(frame, 'STARTING TO COLLECT', (120, 200),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 4, cv2.LINE_AA)
-                    cv2.waitKey(1200)
-                show_landmarks(frame, results)
-                keypoints = extract_keypoints(results)
-                np_path = os.path.join(DATA_PATH, sing, str(video), str(frame_number))
-                np.save(np_path, keypoints)
-                out.write(frame)
-                cv2.imshow('camera', frame)                                  # Show to screen the frame
-                if cv2.waitKey(10) == ord('q'):
-                    break
+        # print it to screen
+        # ' '.join(sentence)
+
+
+        cv2.imshow('camera', frame)                                  # Show to screen the frame
+        if cv2.waitKey(10) == ord('q'):
+            break
     capture.release()
-    out.release()
     cv2.destroyAllWindows()

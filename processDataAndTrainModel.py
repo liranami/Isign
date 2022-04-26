@@ -7,11 +7,11 @@ from tensorflow.keras.callbacks import TensorBoard
 import numpy as np
 
 
-ACTIONS = np.array(['שלום', 'תודה'])
-numbers_of_videos = 30  # Number of videos to each word
-video_length = 30       # Frames we take to analyze
+ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
+numbers_of_videos = 20  # Number of videos to each word
+video_length = 60       # Frames we take to analyze
 label_map = {label: num for num, label in enumerate(ACTIONS)}
-DATA_PATH = os.path.join('Sing_Language_Data')
+DATA_PATH = os.path.join('C:\\Sign_Language_Data')
 
 sequences, labels = [], []
 for sing in ACTIONS:
@@ -32,32 +32,32 @@ log_dir = os.path.join('Logs')
 tb_callback = TensorBoard(log_dir=log_dir)
 
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 1662)))
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(60, 1629)))
 model.add(LSTM(128, return_sequences=True, activation='relu'))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
-model.compile(optimizer='Adam', loss='categorial_crossentropy', metrics=['categorical_accuracy'])
-model.fit(X_train, y_train, epochs=2000, callbacks=[tb_callback])
+model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+model.fit(X_train, y_train, epochs=1000, callbacks=[tb_callback])
 
 model.summary()
 
 # Predict
 res = model.predict(X_test)
 # Checking and print the numbers not fit
-for i in range(ACTIONS):
+for i in range(len(ACTIONS)):
     pre = ACTIONS[np.argmax(res[i])]
     actual = ACTIONS[np.argmax(y_test[i])]
     if pre != actual:
         print(i)
 
-model.save('israeli_sing_language_model.h5')
+model.save('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
 # if we want to load the model
 # !!!!! first !!!!! run the model LSTM and Dense
 # !!!!! second !!!! compile the model
-# and then run this command --> model.load_weights('israeli_sing_language_model.h5')
+# and then run this command --> model.load_weights('israeli_sing_language_model.h5')          model = keras.models.load_model('bottleneck_fc_model.h5')
 
 # To evaluate and confusion matrix :
 # from sklearn.metrix import multilabal_confusion_matrix, accuracy_score

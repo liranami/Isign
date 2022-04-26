@@ -5,8 +5,7 @@ import numpy as np
 import os
 import time
 import mediapipe as mp
-from threading import Thread, Lock
-import userGUI
+
 mp_holistic = mp.solutions.holistic  # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
 
