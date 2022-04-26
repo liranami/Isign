@@ -40,7 +40,8 @@ model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.fit(X_train, y_train, epochs=1000, callbacks=[tb_callback])
+model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
+model.fit(X_train, y_train, epochs=500, callbacks=[tb_callback])
 
 model.summary()
 
