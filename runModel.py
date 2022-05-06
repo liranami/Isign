@@ -1,12 +1,13 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.layers import LSTM, Dense, Dropout
 import numpy as np
 import cv2
 import mediapipe as mp
 
 mp_holistic = mp.solutions.holistic   # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
-ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
+#ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
+ACTIONS = np.array(['השעה - ימין','אתה - ימין'])
 
 def mediapipe_detection(image, model):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Color Convert from BGR(cv2) to RBG
@@ -41,10 +42,13 @@ def extract_keypoints(results):
     return np.concatenate([pose, face, left_hand, right_hand])  # (1662,)
 
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(60, 1629)))
+model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=(60, 1629)))
+model.add(Dropout(0.2))
 model.add(LSTM(128, return_sequences=True, activation='relu'))
+model.add(Dropout(0.2))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
@@ -55,7 +59,7 @@ model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
 sequence = []
 sentence = []
 predictions = []
-threshold = 0.2
+threshold = 0.8
 capture = cv2.VideoCapture(0)
 # Set MediaPipe model
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
@@ -71,7 +75,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
             print(ACTIONS[np.argmax(res)], res)
             predictions.append(np.argmax(res))
 
-            if np.unique(predictions[-20:])[0] == np.argmax(res):
+            if np.unique(predictions[-10:])[0] == np.argmax(res):
                 if res[np.argmax(res)] > threshold:
                     if len(sentence) > 0:
                         if ACTIONS[np.argmax(res)] != sentence[-1]:

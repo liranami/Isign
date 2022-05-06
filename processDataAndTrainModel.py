@@ -2,13 +2,15 @@ import os
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import TensorBoard
 import numpy as np
 
 
-ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
-numbers_of_videos = 20  # Number of videos to each word
+#ACTIONS = np.array(['השעה','אתה - ימין','לא','מה','איפה','שמח'])
+ACTIONS = np.array(['השעה - ימין','אתה - ימין'])
+
+numbers_of_videos = 30  # Number of videos to each word
 video_length = 60       # Frames we take to analyze
 label_map = {label: num for num, label in enumerate(ACTIONS)}
 DATA_PATH = os.path.join('C:\\Sign_Language_Data')
@@ -32,16 +34,19 @@ log_dir = os.path.join('Logs')
 tb_callback = TensorBoard(log_dir=log_dir)
 
 model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(60, 1629)))
-model.add(LSTM(128, return_sequences=True, activation='relu'))
-model.add(LSTM(64, return_sequences=False, activation='relu'))
+model.add(LSTM(128, return_sequences=True, activation='tanh', input_shape=(60, 1629)))
+model.add(Dropout(0.2))
+model.add(LSTM(128, return_sequences=True, activation='tanh'))
+model.add(Dropout(0.2))
+model.add(LSTM(64, return_sequences=False, activation='tanh'))
 model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
-model.fit(X_train, y_train, epochs=500, callbacks=[tb_callback])
+model.fit(X_train, y_train, epochs=150, callbacks=[tb_callback])
 
 model.summary()
 
