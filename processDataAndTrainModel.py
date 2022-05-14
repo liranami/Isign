@@ -7,8 +7,8 @@ from tensorflow.keras.callbacks import TensorBoard
 import numpy as np
 
 
-ACTIONS = np.array(['לא','איפה','שלום','אתה','מה','שמח','עומד','השעה'])
-
+#ACTIONS = np.array(['השעה','אתה - ימין','לא','מה','איפה','שמח'])
+ACTIONS = np.array(['אתה','מה','שמח','עומד','השעה'])
 
 numbers_of_videos = 20  # Number of videos to each word
 video_length = 30       # Frames we take to analyze
@@ -28,7 +28,8 @@ for sing in ACTIONS:
 X = np.array(sequences)
 y = to_categorical(labels).astype(int)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-
+print(X_train.shape)
+print(X_train[0].shape)
 # Build and train LSTM neural Network
 log_dir = os.path.join('Logs')
 tb_callback = TensorBoard(log_dir=log_dir)
@@ -45,8 +46,8 @@ model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
-model.fit(X_train, y_train, epochs=50, callbacks=[tb_callback])
+#model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
+model.fit(X_train, y_train, epochs=500, callbacks=[tb_callback])
 
 model.summary()
 
@@ -54,10 +55,10 @@ model.summary()
 #res = model.predict(X_test)
 # Checking and print the numbers not fit
 #for i in range(len(ACTIONS)):
-#    pre = ACTIONS[np.argmax(res[i])]
-#    actual = ACTIONS[np.argmax(y_test[i])]
-#    if pre != actual:
-#        print(i)
+ #   pre = ACTIONS[np.argmax(res[i])]
+  #  actual = ACTIONS[np.argmax(y_test[i])]
+   # if pre != actual:
+    #    print(i)
 
 model.save('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
 # if we want to load the model

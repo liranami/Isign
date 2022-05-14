@@ -50,24 +50,41 @@ def stopShowVideo(tf):
     global stop
     stop = tf
 
+def update(capture,canvas,holistic_model,window):
+    ret, frame = capture.read()  # Read frame from webcam
+    frame, results = mediapipe_detection(frame, holistic_model)  # Make detections
+    # show_landmarks(frame, results)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+    canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
+    # canvas.image = photo
+    # keypoints = extract_keypoints(results)
+    # cv2.imshow('camera', frame)  # Show to screen the frame
+    window.after(15,update(capture,canvas,holistic_model,window))
+
+
 
 def showVideo(cameraNum, window):
     global stop
     capture = cv2.VideoCapture(int(cameraNum) - 1)
-    canvas = tkinter.Canvas(window, width=516, height=448)
-    canvas.place(x=28, y=107)
+    canvas = tkinter.Canvas(window, width=640, height=480)
+    canvas.place(x=10, y=80)
+    canvas.pack()
     with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
-        while stop:
-            ret, frame = capture.read()  # Read frame from webcam
-            frame, results = mediapipe_detection(frame, holistic_model)  # Make detections
-            show_landmarks(frame, results)
+
+        update(capture,canvas,holistic_model,window)
+        #while stop:
+         #   ret, frame = capture.read()  # Read frame from webcam
+          #  frame, results = mediapipe_detection(frame, holistic_model)  # Make detections
+            #show_landmarks(frame, results)
+           # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             #photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
             #canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
-            #self.canvas.image = photo
+            #canvas.image = photo
             # keypoints = extract_keypoints(results)
-            cv2.imshow('camera', frame)  # Show to screen the frame
-            if cv2.waitKey(10) == ord('q'):
-                break
+            #cv2.imshow('camera', frame)  # Show to screen the frame
+            #if cv2.waitKey(10) == ord('q'):
+             #   break
 
-        capture.release()
-        cv2.destroyAllWindows()
+        #capture.release()
+        #cv2.destroyAllWindows()

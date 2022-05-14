@@ -4,7 +4,26 @@ from tkinter import messagebox
 import main
 import cv2
 import showVideoOnGui
+import tkinter
+import PIL
+import threading
+import time
 from threading import Thread, Lock
+stop = False
+
+
+def startvideo():
+    global stop
+    stop = False
+
+
+def stopvideo():
+    global stop
+    stop = True
+    for i in range(10):
+        print("dsgdgfsdhshsfh")
+
+
 
 def clearCapture(capture):
     capture.release()
@@ -12,7 +31,7 @@ def clearCapture(capture):
 
 def camerasConnected():
     n = 0
-    for i in range(10):
+    for i in range(3):
         try:
             cap = cv2.VideoCapture(i)
             ret, frame = cap.read()
@@ -23,6 +42,22 @@ def camerasConnected():
             clearCapture(cap)
             break
     return n
+
+def update(userGui):
+    global stop
+    capture = cv2.VideoCapture(0)
+    ret, frame = capture.read()  # Read frame from webcam
+    canvas = tkinter.Canvas(userGui, width=640, height=480)
+    canvas.place(x=10, y=80)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+    canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
+    if not stop:
+        userGui.after(1,update(userGui))
+    else:
+        return
+
+
 
 
 def changeToUserWin(oldWin):
@@ -59,8 +94,8 @@ def changeToUserWin(oldWin):
     stopBtn_image = PhotoImage(file='assets/stop_btn.png')
     goBack_image = PhotoImage(file='assets/goBack.png')
     startBtn = Button(image=startBtn_image, borderwidth=0, highlightthickness=0,
-                      command=lambda: showVideoOnGui.showVideo(clicked.get(), userGui), relief="flat")
-    stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command=showVideoOnGui.stopShowVideo(True),
+                      command= lambda: [threading.Thread(target=update, args=(userGui,)).start(),startvideo()], relief="flat")
+    stopBtn = Button(image=stopBtn_image, borderwidth=0, highlightthickness=0, command = lambda: stopvideo(),
                      relief="flat")
     goBackBtn = Button(image=goBack_image, borderwidth=0, highlightthickness=0, command=lambda: main.main(userGui),
                        relief="flat")
@@ -68,5 +103,8 @@ def changeToUserWin(oldWin):
     stopBtn.place(x=902, y=150, width=77, height=30)
     goBackBtn.place(x=26, y=32, width=25, height=25)
 
+    #x = threading.Thread(target=update, args=(userGui,))
+    #update(userGui)
+    #x.start()
     userGui.resizable(False, False)
     userGui.mainloop()
