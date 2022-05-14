@@ -7,7 +7,7 @@ import mediapipe as mp
 mp_holistic = mp.solutions.holistic   # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
 #ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
-ACTIONS = np.array(['השעה - ימין','אתה - ימין'])
+ACTIONS = np.array(['לא','איפה','שלום','אתה','מה','שמח','עומד','השעה'])
 
 def mediapipe_detection(image, model):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Color Convert from BGR(cv2) to RBG
@@ -20,10 +20,10 @@ def mediapipe_detection(image, model):
 
 # Draw face, pose and hands connections
 def show_landmarks(image, results):
-    mp_show.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_CONTOURS,
-                           mp_show.DrawingSpec(color=(80,80,80), thickness=1, circle_radius=1))
-    mp_show.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
-                           mp_show.DrawingSpec(color=(80,80,80), thickness=1, circle_radius=1))
+    #mp_show.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_CONTOURS,
+    #                       mp_show.DrawingSpec(color=(80,80,80), thickness=1, circle_radius=1))
+    #mp_show.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
+    #                       mp_show.DrawingSpec(color=(80,80,80), thickness=1, circle_radius=1))
     mp_show.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
                            mp_show.DrawingSpec(color=(180,100,100), thickness=2, circle_radius=2))
     mp_show.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
@@ -31,18 +31,18 @@ def show_landmarks(image, results):
 
 
 def extract_keypoints(results):
-    pose = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten()\
-        if results.pose_landmarks else np.zeros(33*4)
+    #pose = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten()\
+    #    if results.pose_landmarks else np.zeros(33*4)
     left_hand = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten()\
         if results.left_hand_landmarks else np.zeros(21*3)
     right_hand = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten()\
         if results.right_hand_landmarks else np.zeros(21*3)
-    face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten()\
-        if results.face_landmarks else np.zeros(468*3)
-    return np.concatenate([pose, face, left_hand, right_hand])  # (1662,)
+    #face = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten()\
+    #    if results.face_landmarks else np.zeros(468*3)
+    return np.concatenate([ left_hand, right_hand])  # (1662,)pose, face,
 
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=(60, 1629)))
+model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=(30, 126)))
 model.add(Dropout(0.2))
 model.add(LSTM(128, return_sequences=True, activation='relu'))
 model.add(Dropout(0.2))
@@ -69,13 +69,13 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         #show_landmarks(frame, results)                               # Draw the landmarks
         keypoints = extract_keypoints(results)                       # wxtract key point from image(camera)
         sequence.append(keypoints)
-        sequence = sequence[-60:]
-        if len(sequence) == 60:
+        sequence = sequence[-30:]
+        if len(sequence) == 30:
             res = model.predict(np.expand_dims(sequence, axis=0))[0]
             print(ACTIONS[np.argmax(res)], res)
             predictions.append(np.argmax(res))
 
-            if np.unique(predictions[-10:])[0] == np.argmax(res):
+            if np.unique(predictions[-15:])[0] == np.argmax(res):
                 if res[np.argmax(res)] > threshold:
                     if len(sentence) > 0:
                         if ACTIONS[np.argmax(res)] != sentence[-1]:
@@ -92,7 +92,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
 
         cv2.imshow('camera', frame)                                  # Show to screen the frame
-        if cv2.waitKey(10) == ord('q'):
+        if cv2.waitKey(10) & 0xFF == ord('q'):
             break
     capture.release()
     cv2.destroyAllWindows()

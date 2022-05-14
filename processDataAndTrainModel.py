@@ -7,11 +7,11 @@ from tensorflow.keras.callbacks import TensorBoard
 import numpy as np
 
 
-#ACTIONS = np.array(['השעה','אתה - ימין','לא','מה','איפה','שמח'])
-ACTIONS = np.array(['השעה - ימין','אתה - ימין'])
+ACTIONS = np.array(['לא','איפה','שלום','אתה','מה','שמח','עומד','השעה'])
 
-numbers_of_videos = 30  # Number of videos to each word
-video_length = 60       # Frames we take to analyze
+
+numbers_of_videos = 20  # Number of videos to each word
+video_length = 30       # Frames we take to analyze
 label_map = {label: num for num, label in enumerate(ACTIONS)}
 DATA_PATH = os.path.join('C:\\Sign_Language_Data')
 
@@ -34,11 +34,11 @@ log_dir = os.path.join('Logs')
 tb_callback = TensorBoard(log_dir=log_dir)
 
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, activation='tanh', input_shape=(60, 1629)))
+model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=X_train[0].shape))
 model.add(Dropout(0.2))
-model.add(LSTM(128, return_sequences=True, activation='tanh'))
+model.add(LSTM(128, return_sequences=True, activation='relu'))
 model.add(Dropout(0.2))
-model.add(LSTM(64, return_sequences=False, activation='tanh'))
+model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(32, activation='relu'))
@@ -46,18 +46,18 @@ model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
-model.fit(X_train, y_train, epochs=150, callbacks=[tb_callback])
+model.fit(X_train, y_train, epochs=50, callbacks=[tb_callback])
 
 model.summary()
 
 # Predict
-res = model.predict(X_test)
+#res = model.predict(X_test)
 # Checking and print the numbers not fit
-for i in range(len(ACTIONS)):
-    pre = ACTIONS[np.argmax(res[i])]
-    actual = ACTIONS[np.argmax(y_test[i])]
-    if pre != actual:
-        print(i)
+#for i in range(len(ACTIONS)):
+#    pre = ACTIONS[np.argmax(res[i])]
+#    actual = ACTIONS[np.argmax(y_test[i])]
+#    if pre != actual:
+#        print(i)
 
 model.save('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
 # if we want to load the model
