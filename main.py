@@ -43,9 +43,9 @@ class Start(Frame):
         self.userBtn_image = PhotoImage(file='assets/user.png')
         self.developerBtn_image = PhotoImage(file='assets/developer.png')
         self.userBtn = Button(parent, image=self.userBtn_image, borderwidth=0, highlightthickness=0,
-                         command=lambda: controller.show_frame(UserGUI(parent, controller, self)), relief="flat")
+                              command=lambda: controller.show_frame(UserGUI(parent, controller, self)), relief="flat")
         self.developerBtn = Button(parent, image=self.developerBtn_image, borderwidth=0, highlightthickness=0,
-                              command=lambda: developerLogin.logIn(self), relief="flat")
+                                   command=lambda: developerLogin.logIn(self), relief="flat")
         self.userBtn.place(x=660, y=390, width=208, height=60)
         self.developerBtn.place(x=660, y=250, width=208, height=60)
         self.canvas.create_text(721, 191, anchor="nw", text="You are", fill="#000000", font=("Roboto", 24 * -1))
@@ -56,4 +56,5 @@ class Start(Frame):
 if __name__ == '__main__':
     gui = MainApp()
     gui.resizable(False, False)
+    gui.update()
     gui.mainloop()
