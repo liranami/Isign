@@ -1,7 +1,7 @@
 from tkinter import *
 from PIL import Image, ImageTk
 import tkinter as tk
-from userGUI import UserGUI
+import userGUI
 import developerLogin
 
 
@@ -43,7 +43,7 @@ class Start(Frame):
         self.userBtn_image = PhotoImage(file='assets/user.png')
         self.developerBtn_image = PhotoImage(file='assets/developer.png')
         self.userBtn = Button(parent, image=self.userBtn_image, borderwidth=0, highlightthickness=0,
-                              command=lambda: controller.show_frame(UserGUI(parent, controller, self)), relief="flat")
+                              command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller)), relief="flat")
         self.developerBtn = Button(parent, image=self.developerBtn_image, borderwidth=0, highlightthickness=0,
                                    command=lambda: developerLogin.logIn(self), relief="flat")
         self.userBtn.place(x=660, y=390, width=208, height=60)

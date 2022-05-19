@@ -6,7 +6,7 @@ import mediapipe as mp
 
 mp_holistic = mp.solutions.holistic   # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
-#ACTIONS = np.array(['השעה','אתה','לא','מה','איפה','שמח'])
+
 ACTIONS = np.array(['לא','איפה','שלום','אתה','מה','שמח','עומד','השעה'])
 
 def mediapipe_detection(image, model):
