@@ -71,7 +71,7 @@ class StartVideo:
         model.add(Dense(32, activation='relu'))
         model.add(Dense(self.words.shape[0], activation='softmax'))
         model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-        model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
+        model.load_weights('model\\israeli_sing_language_model.h5')
         return model
 
     def results_from_model(self, results):
@@ -80,7 +80,7 @@ class StartVideo:
         sequence = self.sequence[-30:]
         if len(sequence) == 30:
             res = self.model.predict(np.expand_dims(sequence, axis=0))[0]
-            print(self.words[np.argmax(res)], res)
+            # print(self.words[np.argmax(res)], res)
             self.predictions.append(np.argmax(res))
             checkRes = self.words[np.argmax(res)]
             if np.unique(self.predictions[-15:])[0] == np.argmax(res):
@@ -88,13 +88,20 @@ class StartVideo:
                     if len(self.sentence) > 0:
                         if checkRes != self.sentence[-1]:
                             self.sentence.append(checkRes)
-                            print(self.sentence)
+                            return checkRes
+                            # self.sentence.append(checkRes)
+                            # print(self.sentence)
                     else:
                         self.sentence.append(checkRes)
-                        print(self.sentence)
+                        return checkRes
+                        # self.sentence.append(checkRes)
+                        # print(self.sentence)
         if len(self.sentence) > 8:
             self.sentence = self.sentence[-8:]
-        return self.sentence
+        if len(self.predictions) > 40:
+            self.predictions = self.predictions[-40:]
+
+        return 'עומד'
 
     def set_stop(self, stop):
         self.stop = stop
@@ -110,7 +117,9 @@ class StartVideo:
                     photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
                     self.video_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
                     sentence = self.results_from_model(results)
-                    self.to_update.textarea.insert(tk.END, sentence)
+                    if sentence != 'עומד':
+                        self.to_update.textarea.insert(tk.END, sentence)
+                        self.to_update.textarea.insert(tk.END, " ")
                     self.to_update.update()
 
             else:

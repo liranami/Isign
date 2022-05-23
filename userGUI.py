@@ -85,6 +85,8 @@ class UserGUI(Frame):
     def stopvideo(self, back=None):
         self.camera.set_stop(True)# = True
         self.startBtn.config(state="normal")
+        self.textarea.delete("1.0","end")
+
         if back:
             time.sleep(1)
 
