@@ -14,14 +14,17 @@ class MainApp(Tk):
         self.icon = PhotoImage(file='assets/Logo.png')
         self.iconphoto(True, self.icon)
         self.configure(bg="#FFFFFF")
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-        self.show_frame(Start(container, self))
+        self.container = tk.Frame(self)
+        self.container.pack(side="top", fill="both", expand=True)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
+        self.show_frame(Start(self.container, self))
 
     def show_frame(self, main):
-        main.tkraise()
+        if main == "main":
+            Start(self.container, self).tkraise()
+        else:
+            main.tkraise()
 
 
 class Start(Frame):
@@ -43,7 +46,7 @@ class Start(Frame):
         self.userBtn_image = PhotoImage(file='assets/user.png')
         self.developerBtn_image = PhotoImage(file='assets/developer.png')
         self.userBtn = Button(parent, image=self.userBtn_image, borderwidth=0, highlightthickness=0,
-                              command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller)), relief="flat")
+                              command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller, self)), relief="flat")
         self.developerBtn = Button(parent, image=self.developerBtn_image, borderwidth=0, highlightthickness=0,
                                    command=lambda: developerLogin.logIn(self), relief="flat")
         self.userBtn.place(x=660, y=390, width=208, height=60)

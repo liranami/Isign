@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -12,18 +13,20 @@ from threading import Thread, Lock
 
 class UserGUI(Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, main):
         Frame.__init__(self, parent)
         self.parent = parent
-        self.controller = controller
+        main.destroy()
+        self.capture = None
         self.stop = False
         self.canvas = Canvas(parent, bg="#FFFFFF", height=600, width=1024, bd=0, highlightthickness=0, relief="ridge")
         self.canvas.place(x=0, y=0)
+        self.canvas.create_rectangle(8.0, 78.0, 654.0, 564.0, fill="#FFFFFF", outline="#000000")
         self.video_canvas = tkinter.Canvas(self.parent, width=640, height=480)
         self.video_canvas.place(x=10, y=80)
-        self.adapt = AdapterUserGui(self.stop, self.video_canvas)
+        self.camera = StartVideo(self)
+        self.controller = controller
         self.canvas.create_rectangle(670.0, 9.0, 670.0, 590.0, fill="#3D7892", outline="")
-        self.canvas.create_rectangle(8.0, 78.0, 654.0, 564.0, fill="#FFFFFF", outline="#000000")
         self.canvas.create_text(680.0, 242.0, anchor="nw", text="translated words :", fill="#000000",
                                 font=("Roboto", 18 * -1))
         self.canvas.create_text(750.0, 40.0, anchor="nw", text="Isign", fill="#000000", font=("Roboto", 64 * -1))
@@ -50,7 +53,7 @@ class UserGUI(Frame):
                               command=lambda: self.stopvideo(),
                               relief="flat")
         self.goBackBtn = Button(parent, image=self.goBack_image, borderwidth=0, highlightthickness=0,
-                                command=lambda: 1+1 , relief="flat") #controller.show_frame()
+                                command=lambda: [self.stopvideo(True), self.controller.show_frame("main")] , relief="flat") #controller.show_frame()
         self.startBtn.place(x=814, y=150, width=77, height=30)
         self.stopBtn.place(x=902, y=150, width=77, height=30)
         self.goBackBtn.place(x=26, y=32, width=25, height=25)
@@ -66,21 +69,25 @@ class UserGUI(Frame):
                 self.options.append(i + 1)
 
     def startvideo(self):
-        self.adapt.set_stop = False
+        self.camera.set_stop(False)# = False
         #self.check_cameras()
         if self.numOfCams == 0:
             messagebox.showerror("Error", "Please connect camera!")
         else:
             self.capture = cv2.VideoCapture(int(self.clicked.get()) - 1)
-            self.adapt.set_capture(self.capture)
-            camera = StartVideo(self.adapt, self)
-            threading.Thread(target=camera.showVideo()).start()
-            #threading.Thread(target=camera.showVideo()).start()
+            #self.adapt.set_capture(self.capture)
+            self.camera = StartVideo(self)
             self.startBtn.config(state="disabled")
+            threading.Thread(target=self.camera.showVideo()).start()
+            #threading.Thread(target=camera.showVideo()).start()
 
-    def stopvideo(self):
-        self.adapt.set_stop = True
+
+    def stopvideo(self, back=None):
+        self.camera.set_stop(True)# = True
         self.startBtn.config(state="normal")
+        if back:
+            time.sleep(1)
+
 
     def clearCapture(self, capture):
         capture.release()
