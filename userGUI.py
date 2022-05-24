@@ -17,6 +17,7 @@ class UserGUI(Frame):
         Frame.__init__(self, parent)
         self.parent = parent
         main.destroy()
+        controller.title("Isign - User")
         self.capture = None
         self.stop = False
         self.canvas = Canvas(parent, bg="#FFFFFF", height=600, width=1024, bd=0, highlightthickness=0, relief="ridge")

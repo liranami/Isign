@@ -6,6 +6,16 @@ import cv2
 import showVideoOnGui
 from threading import Thread, Lock
 
+
+class DevGUI(Frame):
+
+    def __init__(self, parent, controller, dev_login):
+        Frame.__init__(self, parent)
+        self.parent = parent
+        dev_login.destroy()
+        controller.title("Isign - Developer")
+
+
 def clearCapture(capture):
     capture.release()
     cv2.destroyAllWindows()
@@ -67,6 +77,3 @@ def changeToDevWin(oldWin):
     startBtn.place(x=814, y=150, width=77, height=30)
     stopBtn.place(x=902, y=150, width=77, height=30)
     goBackBtn.place(x=26, y=32, width=25, height=25)
-
-    devGui.resizable(False, False)
-    devGui.mainloop()

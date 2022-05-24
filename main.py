@@ -32,7 +32,7 @@ class Start(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         self.controller = controller
-
+        self.controller.title("Isign")
         self.canvas = Canvas(parent, bg="#FFFFFF", height=600, width=1024, bd=0, highlightthickness=0, relief="ridge")
         self.canvas.place(x=0, y=0)
         # create blue rectangle and on top of it our Isign LOGO
@@ -48,7 +48,7 @@ class Start(Frame):
         self.userBtn = Button(parent, image=self.userBtn_image, borderwidth=0, highlightthickness=0,
                               command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller, self)), relief="flat")
         self.developerBtn = Button(parent, image=self.developerBtn_image, borderwidth=0, highlightthickness=0,
-                                   command=lambda: developerLogin.logIn(self), relief="flat")
+                                   command=lambda: controller.show_frame(developerLogin.dev_login(parent, controller, self)), relief="flat")
         self.userBtn.place(x=660, y=390, width=208, height=60)
         self.developerBtn.place(x=660, y=250, width=208, height=60)
         self.canvas.create_text(721, 191, anchor="nw", text="You are", fill="#000000", font=("Roboto", 24 * -1))
