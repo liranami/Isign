@@ -4,11 +4,8 @@ from tkinter import ttk
 from tkinter import messagebox
 import cv2
 from showVideoOnGui import StartVideo
-from UserToVideo import AdapterUserGui
-import tkinter
 import PIL
 import threading
-from threading import Thread, Lock
 
 
 class UserGUI(Frame):
@@ -23,7 +20,7 @@ class UserGUI(Frame):
         self.canvas = Canvas(parent, bg="#FFFFFF", height=600, width=1024, bd=0, highlightthickness=0, relief="ridge")
         self.canvas.place(x=0, y=0)
         self.canvas.create_rectangle(8.0, 78.0, 654.0, 564.0, fill="#FFFFFF", outline="#000000")
-        self.video_canvas = tkinter.Canvas(self.parent, width=640, height=480)
+        self.video_canvas = Canvas(self.parent, width=640, height=480)
         self.video_canvas.place(x=10, y=80)
         self.camera = StartVideo(self)
         self.controller = controller
@@ -76,7 +73,6 @@ class UserGUI(Frame):
             messagebox.showerror("Error", "Please connect camera!")
         else:
             self.capture = cv2.VideoCapture(int(self.clicked.get()) - 1)
-            #self.adapt.set_capture(self.capture)
             self.camera = StartVideo(self)
             self.startBtn.config(state="disabled")
             threading.Thread(target=self.camera.showVideo()).start()
@@ -112,15 +108,15 @@ class UserGUI(Frame):
                 break
         return n
 
-    def show_video(self):
-        while not self.stop:
-            ret, frame = self.capture.read()  # Read frame from webcam
-            if ret:
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-                self.video_canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
-                #self.after(15, self.show_video())  # this is with if
-                self.update()  # this is with while
-        else:
-            self.capture.release()
+#    def show_video(self):
+#        while not self.stop:
+#            ret, frame = self.capture.read()  # Read frame from webcam
+#            if ret:
+#                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#                photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+#                self.video_canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
+#                self.after(15, self.show_video())  # this is with if
+#                self.update()  # this is with while
+#        else:
+#            self.capture.release()
             #cv2.destroyAllWindows()

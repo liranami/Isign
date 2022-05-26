@@ -42,27 +42,21 @@ class dev_login(Frame):
                                 command=lambda: self.controller.show_frame("main"),
                                 relief="flat")
         self.logInBtn = Button(self.parent, image=self.logInBtn_image, borderwidth=0, highlightthickness=0,
-                               command=lambda: self.validUsers(self.username, self.password, self.parent),
+                               command=lambda: self.validUsers(self.username, self.password),
                                relief="flat")
         self.logInBtn.place(x=705, y=426, width=158, height=52)
         self.goBackBtn.place(x=26, y=32, width=22, height=20)
 
-
-    def validUsers(self, check_details, password, logInGui):
+    def validUsers(self, check_details, password):
         data = open('LogIn\\users.json')
         users = json.load(data)
-        print(users)
         for user in users:
-            print(user)
             if user["username"].lower() == check_details.get().lower() and user["password"].lower() == password.get():
-                print("YAYYYY")
-                devGUI.DevGUI(self.parent, self.controller, self)
+                self.controller.show_frame(devGUI.DevGUI(self.parent, self.controller, self))
                 break
         else:
-            print("booo")
-
-
-
+            self.canvas.create_text(715.0, 400.0, anchor="nw", text="invalid username or password", fill="red",
+                                    font=("Roboto", 10 * -1))
         #if user.get().lower() == 'liran' and password.get() == 'pass':
         #    devGUI.changeToDevWin(logInGui)
         #else:

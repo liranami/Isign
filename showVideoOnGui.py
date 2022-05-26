@@ -14,20 +14,25 @@ from words import Words
 
 class StartVideo:
 
-    def __init__(self, toupdate):
+    def __init__(self, toupdate, dev=None):
         self.to_update = toupdate
         self.cap = self.to_update.capture
         self.stop = self.to_update.stop
         self.mp_holistic = mp.solutions.holistic  # MediaPipe Holistic model
         self.mp_show = mp.solutions.drawing_utils  # Drawing utilities
         self.video_canvas = self.to_update.video_canvas
-        wordClass = Words()
-        self.words = wordClass.get()
-        self.model = self.lstm_model()
-        self.sequence = []
-        self.sentence = []
-        self.predictions = []
-        self.threshold = 0.8
+        self.dev = dev
+        if self.dev is None:
+            self.base_word = 'עומד'
+            wordClass = Words()
+            self.words = wordClass.get()
+            self.model = self.lstm_model()
+            self.sequence = []
+            self.sentence = []
+            self.predictions = []
+            self.threshold = 0.8
+        else:
+            pass
 
     def mediapipe_detection(self, image, model):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Color Convert from BGR(cv2) to RBG
@@ -75,7 +80,7 @@ class StartVideo:
         return model
 
     def results_from_model(self, results):
-        keyPoints = self.extract_keypoints(results)  # wxtract key point from image(camera)
+        keyPoints = self.extract_keypoints(results)  # extract key point from image(camera)
         self.sequence.append(keyPoints)
         sequence = self.sequence[-30:]
         if len(sequence) == 30:
@@ -84,7 +89,7 @@ class StartVideo:
             self.predictions.append(np.argmax(res))
             checkRes = self.words[np.argmax(res)]
             if np.unique(self.predictions[-15:])[0] == np.argmax(res):
-                if res[np.argmax(res)] > self.threshold and checkRes != 'עומד':
+                if res[np.argmax(res)] > self.threshold and checkRes != self.base_word:
                     if len(self.sentence) > 0:
                         if checkRes != self.sentence[-1]:
                             self.sentence.append(checkRes)
@@ -101,7 +106,7 @@ class StartVideo:
         if len(self.predictions) > 40:
             self.predictions = self.predictions[-40:]
 
-        return 'עומד'
+        return self.base_word
 
     def set_stop(self, stop):
         self.stop = stop
@@ -117,7 +122,7 @@ class StartVideo:
                     photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
                     self.video_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
                     sentence = self.results_from_model(results)
-                    if sentence != 'עומד':
+                    if sentence != self.base_word:
                         self.to_update.textarea.insert(tk.END, sentence)
                         self.to_update.textarea.insert(tk.END, " ")
                     self.to_update.update()
@@ -125,3 +130,17 @@ class StartVideo:
             else:
                 self.cap.release()
 
+    def recordVideo(self):
+        with self.mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
+            while not self.stop:
+                ret, frame = self.cap.read()  # Read frame from webcam
+                if ret:
+                    frame, results = self.mediapipe_detection(frame, holistic_model)  # Make detections
+                    self.show_landmarks(frame, results)                                # Draw the landmarks
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+                    self.video_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
+                    self.to_update.update()
+            else:
+                self.cap.release()
+        # take from create video per word
