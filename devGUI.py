@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from tkinter import messagebox
 import cv2
 from showVideoOnGui import StartVideo
@@ -37,7 +37,7 @@ class DevGUI(Frame):
         self.text_numOfVideo = StringVar()
         self.numOfVideoEntry = Entry(self.parent, textvariable=self.text_numOfVideo)
         self.numOfVideoEntry.place(x=780, y=280, width=100, height=20)
-
+        self.folder_selected = ""
         # Drop down
         self.clicked = StringVar()
         self.options = []
@@ -48,18 +48,13 @@ class DevGUI(Frame):
         self.chooseCamera.place(x=780, y=150, width=100, height=30)
         # create start/stop Btn - and texts
         self.startBtn_image = PhotoImage(file='assets/start_btn.png')
-        self.stopBtn_image = PhotoImage(file='assets/stop_btn.png')
         self.goBack_image = PhotoImage(file='assets/goBack.png')
         self.startBtn = Button(parent, image=self.startBtn_image, borderwidth=0, highlightthickness=0,
                                command=lambda: [self.startvideo()], relief="flat")
-        self.stopBtn = Button(parent, image=self.stopBtn_image, borderwidth=0, highlightthickness=0,
-                              command=lambda: self.stopvideo(),
-                              relief="flat")
         self.goBackBtn = Button(parent, image=self.goBack_image, borderwidth=0, highlightthickness=0,
-                                command=lambda: [self.stopvideo(True), self.controller.show_frame("main")],
+                                command=lambda: [self.controller.show_frame("main")],
                                 relief="flat")  # controller.show_frame()
-        self.startBtn.place(x=762, y=320, width=77, height=30)
-        self.stopBtn.place(x=850, y=320, width=77, height=30)
+        self.startBtn.place(x=780, y=320, width=77, height=30)
         self.goBackBtn.place(x=26, y=32, width=25, height=25)
 
     def check_cameras(self):
@@ -73,24 +68,21 @@ class DevGUI(Frame):
                 self.options.append(i + 1)
 
     def startvideo(self):
+        word = self.text_word.get()
+        num_video = self.text_numOfVideo.get()
         self.camera.set_stop(False)  # = False
         # self.check_cameras()
         if self.numOfCams == 0:
             messagebox.showerror("Error", "Please connect camera!")
+        elif word == '' or num_video == '':
+            messagebox.showerror("Error", "Please fill all fields!")
         else:
+            self.folder_selected = filedialog.askdirectory(title="select path to save")
             self.capture = cv2.VideoCapture(int(self.clicked.get()) - 1)
             self.camera = StartVideo(self, "dev")
             self.startBtn.config(state="disabled")
-            threading.Thread(target=self.camera.recordVideo()).start()
+            threading.Thread(target=self.camera.recordVideo(word, int(num_video), self.folder_selected)).start()
             # threading.Thread(target=camera.showVideo()).start()
-
-    def stopvideo(self, back=None):
-        self.camera.set_stop(True)  # = True
-        self.startBtn.config(state="normal")
-        self.textarea_word.delete("1.0", "end")
-        self.textarea_numOfVideo.delete("1.0","end")
-        if back:
-            time.sleep(1)
 
     def clearCapture(self, capture):
         capture.release()

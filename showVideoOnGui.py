@@ -103,8 +103,8 @@ class StartVideo:
                         # print(self.sentence)
         if len(self.sentence) > 8:
             self.sentence = self.sentence[-8:]
-        if len(self.predictions) > 40:
-            self.predictions = self.predictions[-40:]
+        if len(self.predictions) > 60:
+            self.predictions = self.predictions[-80:]
 
         return self.base_word
 
@@ -130,17 +130,54 @@ class StartVideo:
             else:
                 self.cap.release()
 
-    def recordVideo(self):
+    def recordVideo(self, word, num_video, folder_selected):
+        sing_language_action = np.array([word])
+        #DATA_PATH = os.path.join('C:\\Sign_Language_Data')  # receive from user
+        DATA_PATH = os.path.join(folder_selected)
+        numbers_of_videos = num_video  # Number of videos to the word
+        video_length = 30  # Frames we take to analyze
+        for video in range(numbers_of_videos):
+            try:
+                os.makedirs(os.path.join(DATA_PATH, sing_language_action[0], str(video)))
+            except:
+                print("error in making Directory")
+
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+
         with self.mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
-            while not self.stop:
-                ret, frame = self.cap.read()  # Read frame from webcam
-                if ret:
-                    frame, results = self.mediapipe_detection(frame, holistic_model)  # Make detections
-                    self.show_landmarks(frame, results)                                # Draw the landmarks
-                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-                    self.video_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
-                    self.to_update.update()
-            else:
-                self.cap.release()
+            for video in range(numbers_of_videos):
+                out = cv2.VideoWriter(DATA_PATH + '\\' + sing_language_action[0] + '\\' + str(video) + '.avi', fourcc, 20.0, (640, 480))
+                for frame_number in range(video_length):
+
+                    ret, frame = self.cap.read()  # Read frame from webcam
+                    if ret:
+                        frame, results = self.mediapipe_detection(frame, holistic_model)  # Make detections
+                        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        cv2.putText(frame, 'Collecting video number {}'.format(video), (15, 12),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, cv2.LINE_AA)
+                        if frame_number == 0:
+                            for _ in range(3):
+                                cv2.putText(frame, 'STARTING TO COLLECT', (120, 200),
+                                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 4, cv2.LINE_AA)
+                                photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+                                self.video_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
+                                self.to_update.update()
+                            cv2.waitKey(50)
+                        self.show_landmarks(frame, results)                                # Draw the landmarks
+                        keyPoints = self.extract_keypoints(results)
+                        np_path = os.path.join(DATA_PATH, sing_language_action[0], str(video), str(frame_number))
+                        np.save(np_path, keyPoints)
+                        photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
+                        self.video_canvas.create_image(0, 0, image=photo, anchor=tk.NW)
+                        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                        out.write(frame)
+                        self.to_update.update()
+        #else:
+            self.cap.release()
+            # self.camera.set_stop(True)
+            self.to_update.startBtn.config(state="normal")
+
+
+
+
         # take from create video per word
