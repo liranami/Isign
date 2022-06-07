@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from PIL import Image, ImageTk
 import tkinter as tk
 import userGUI
@@ -45,12 +46,29 @@ class Start(Frame):
         # create Developer/User Btn - and texts
         self.userBtn_image = PhotoImage(file='assets/user.png')
         self.developerBtn_image = PhotoImage(file='assets/developer.png')
+        self.info_img = Image.open('assets/info.png')
+        #self.info_resize = self.info_img.resize((25, 25), Image.ANTIALIAS)
+        self.info_image = ImageTk.PhotoImage(self.info_img.resize((25, 25)))
+        #self.info_image = PhotoImage(file='assets/info1.png')
         self.userBtn = Button(parent, image=self.userBtn_image, borderwidth=0, highlightthickness=0,
-                              command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller, self)), relief="flat")
+                              command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller, self)),
+                              relief="flat")
         self.developerBtn = Button(parent, image=self.developerBtn_image, borderwidth=0, highlightthickness=0,
-                                   command=lambda: controller.show_frame(developerLogin.dev_login(parent, controller, self)), relief="flat")
+                                   command=lambda: controller.show_frame(
+                                       developerLogin.dev_login(parent, controller, self)), relief="flat")
+        self.infoBtn = Button(parent, image=self.info_image,
+                              command=lambda: messagebox.showinfo("showinfo",
+                                                                  "Want to translate sign to word? enter "
+                                                                  "'User':\nJust click Start and the program will do "
+                                                                  "the rest :)\n\nTo "
+                                                                  "create new video to train enter 'Developer'\n(need "
+                                                                  "username and password):\nThere you will enter word "
+                                                                  "that will represent the movement and number of "
+                                                                  "video you want to capture\nin the end choose where "
+                                                                  "to save it"), relief="flat")
         self.userBtn.place(x=660, y=390, width=208, height=60)
         self.developerBtn.place(x=660, y=250, width=208, height=60)
+        self.infoBtn.place(x=26, y=550, width=25, height=25)
         self.canvas.create_text(721, 191, anchor="nw", text="You are", fill="#000000", font=("Roboto", 24 * -1))
         self.canvas.create_text(746, 340, anchor="nw", text="Or", fill="#000000", font=("Roboto", 24 * -1))
         self.canvas.create_text(698, 56, anchor="nw", text="Isign", fill="#000000", font=("Roboto", 64 * -1))
