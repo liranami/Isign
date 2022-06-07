@@ -3,9 +3,8 @@ from tkinter import ttk, filedialog
 from tkinter import messagebox
 import cv2
 from showVideoOnGui import StartVideo
-import time
-import showVideoOnGui
 import threading
+
 
 class DevGUI(Frame):
 
@@ -71,7 +70,6 @@ class DevGUI(Frame):
         word = self.text_word.get()
         num_video = self.text_numOfVideo.get()
         self.camera.set_stop(False)  # = False
-        # self.check_cameras()
         if self.numOfCams == 0:
             messagebox.showerror("Error", "Please connect camera!")
         elif word == '' or num_video == '':
@@ -82,7 +80,6 @@ class DevGUI(Frame):
             self.camera = StartVideo(self, "dev")
             self.startBtn.config(state="disabled")
             threading.Thread(target=self.camera.recordVideo(word, int(num_video), self.folder_selected)).start()
-            # threading.Thread(target=camera.showVideo()).start()
 
     def clearCapture(self, capture):
         capture.release()

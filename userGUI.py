@@ -4,7 +4,6 @@ from tkinter import ttk
 from tkinter import messagebox
 import cv2
 from showVideoOnGui import StartVideo
-import PIL
 import threading
 
 
@@ -108,15 +107,3 @@ class UserGUI(Frame):
                 break
         return n
 
-#    def show_video(self):
-#        while not self.stop:
-#            ret, frame = self.capture.read()  # Read frame from webcam
-#            if ret:
-#                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#                photo = PIL.ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-#                self.video_canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
-#                self.after(15, self.show_video())  # this is with if
-#                self.update()  # this is with while
-#        else:
-#            self.capture.release()
-            #cv2.destroyAllWindows()
