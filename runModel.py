@@ -7,7 +7,8 @@ import mediapipe as mp
 mp_holistic = mp.solutions.holistic   # MediaPipe Holistic model
 mp_show = mp.solutions.drawing_utils  # Drawing utilities
 
-ACTIONS = np.array(['לא','איפה','שלום','אתה','מה','שמח','עומד','השעה'])
+#ACTIONS = np.array(['לא','איפה','שלום','אתה','מה','שמח','עומד','השעה'])
+ACTIONS = np.array(['אתה', 'מה', 'שמח', 'עומד', 'השעה', 'אני', 'איפה', 'השם', 'לא', 'עצוב', 'שלום', 'שלך'])
 
 def mediapipe_detection(image, model):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Color Convert from BGR(cv2) to RBG
@@ -48,18 +49,18 @@ model.add(LSTM(128, return_sequences=True, activation='relu'))
 model.add(Dropout(0.2))
 model.add(LSTM(64, return_sequences=False, activation='relu'))
 model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.2))
+#model.add(Dropout(0.2))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
+model.load_weights('model\\hap_israeli_sing_language_model.h5')
 
 
 sequence = []
 sentence = []
 predictions = []
-threshold = 0.8
+threshold = 0.9
 capture = cv2.VideoCapture(0)
 # Set MediaPipe model
 with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic_model:
@@ -72,20 +73,22 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         sequence = sequence[-30:]
         if len(sequence) == 30:
             res = model.predict(np.expand_dims(sequence, axis=0))[0]
-            print(ACTIONS[np.argmax(res)], res)
+            #print(ACTIONS[np.argmax(res)], res)
             predictions.append(np.argmax(res))
 
             if np.unique(predictions[-15:])[0] == np.argmax(res):
                 if res[np.argmax(res)] > threshold:
                     if len(sentence) > 0:
-                        if ACTIONS[np.argmax(res)] != sentence[-1]:
+                        if ACTIONS[np.argmax(res)] != sentence[-1] and ACTIONS[np.argmax(res)]!='עומד':
                             sentence.append(ACTIONS[np.argmax(res)])
+                            sequence = sequence[-15:]
                             print(sentence)
+                            if len(sentence) > 12:
+                                sentence = []
                     else:
                         sentence.append(ACTIONS[np.argmax(res)])
                         print(sentence)
-        if len(sentence) > 8:
-            sentence = sentence[-8:]
+
 
         # print it to screen
         # ' '.join(sentence)

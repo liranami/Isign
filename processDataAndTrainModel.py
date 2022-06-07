@@ -1,4 +1,6 @@
 import os
+
+from sklearn.metrics import multilabel_confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
@@ -6,12 +8,10 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import TensorBoard
 import numpy as np
 
+ACTIONS = np.array(['אתה', 'מה', 'שמח', 'עומד', 'השעה', 'אני', 'איפה', 'השם', 'לא', 'עצוב', 'שלום', 'שלך'])
 
-#ACTIONS = np.array(['השעה','אתה - ימין','לא','מה','איפה','שמח'])
-ACTIONS = np.array(['אתה','מה','שמח','עומד','השעה'])
-
-numbers_of_videos = 20  # Number of videos to each word
-video_length = 30       # Frames we take to analyze
+numbers_of_videos = 70  # Number of videos to each word
+video_length = 30  # Frames we take to analyze
 label_map = {label: num for num, label in enumerate(ACTIONS)}
 DATA_PATH = os.path.join('C:\\Sign_Language_Data')
 
@@ -46,21 +46,21 @@ model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-#model.load_weights('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
-model.fit(X_train, y_train, epochs=500, callbacks=[tb_callback])
+model.load_weights('model\\hap_israeli_sing_language_model.h5')
+model.fit(X_train, y_train, epochs=10, callbacks=[tb_callback])
 
 model.summary()
 
 # Predict
-#res = model.predict(X_test)
+# res = model.predict(X_test)
 # Checking and print the numbers not fit
-#for i in range(len(ACTIONS)):
- #   pre = ACTIONS[np.argmax(res[i])]
-  #  actual = ACTIONS[np.argmax(y_test[i])]
-   # if pre != actual:
-    #    print(i)
+# for i in range(len(res)):
+#    pre = ACTIONS[np.argmax(res[i])]
+#    actual = ACTIONS[np.argmax(y_test[i])]
+#    if pre != actual:
+#        print(i)
 
-model.save('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
+model.save('model\\hap_israeli_sing_language_model.h5')
 # if we want to load the model
 # !!!!! first !!!!! run the model LSTM and Dense
 # !!!!! second !!!! compile the model
@@ -68,7 +68,8 @@ model.save('C:\\Sign_Language_Data\\israeli_sing_language_model.h5')
 
 # To evaluate and confusion matrix :
 # from sklearn.metrix import multilabal_confusion_matrix, accuracy_score
-# res = model.predict(X_test)
-# ytrue = np.argmax(y_test, axis=1).tolist()
-# yhat = np.argmax(res, axis=1).tolist()
-# multilabel_confusion_matrix(ytrue, yhat)
+res = model.predict(X_test)
+ytrue = np.argmax(y_test, axis=1).tolist()
+yhat = np.argmax(res, axis=1).tolist()
+print(multilabel_confusion_matrix(ytrue, yhat))
+print(accuracy_score(ytrue, yhat))

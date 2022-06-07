@@ -76,7 +76,7 @@ class StartVideo:
         model.add(Dense(32, activation='relu'))
         model.add(Dense(self.words.shape[0], activation='softmax'))
         model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-        model.load_weights('model\\israeli_sing_language_model.h5')
+        model.load_weights('model\\updated_israeli_sing_language_model.h5')
         return model
 
     def results_from_model(self, results):
@@ -88,11 +88,12 @@ class StartVideo:
             # print(self.words[np.argmax(res)], res)
             self.predictions.append(np.argmax(res))
             checkRes = self.words[np.argmax(res)]
-            if np.unique(self.predictions[-15:])[0] == np.argmax(res):
+            if np.unique(self.predictions[-16:])[0] == np.argmax(res):
                 if res[np.argmax(res)] > self.threshold and checkRes != self.base_word:
                     if len(self.sentence) > 0:
                         if checkRes != self.sentence[-1]:
                             self.sentence.append(checkRes)
+                            self.sentence = self.sentence[-15:]
                             return checkRes
                             # self.sentence.append(checkRes)
                             # print(self.sentence)
@@ -101,10 +102,11 @@ class StartVideo:
                         return checkRes
                         # self.sentence.append(checkRes)
                         # print(self.sentence)
-        if len(self.sentence) > 8:
-            self.sentence = self.sentence[-8:]
-        if len(self.predictions) > 60:
-            self.predictions = self.predictions[-80:]
+        #if len(self.sentence) > 8:
+         #   self.sentence = self.sentence[-8:]
+        if len(self.predictions) > 180:
+            #self.predictions = self.predictions[-80:]
+            self.predictions = self.predictions[-40:]
 
         return self.base_word
 
