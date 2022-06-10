@@ -7,7 +7,10 @@ import threading
 
 
 class DevGUI(Frame):
-
+    """export data from video
+        Click 'start' to start capture
+        The video and save data points of hands
+        You need to fill the 'Word' and 'number of video'"""
     def __init__(self, parent, controller, dev_login):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -23,11 +26,11 @@ class DevGUI(Frame):
         self.video_canvas.place(x=10, y=80)
         self.camera = StartVideo(self, "dev")
         self.controller = controller
+        # create start/stop Btn - and texts
         self.canvas.create_rectangle(670.0, 9.0, 670.0, 590.0, fill="#3D7892", outline="")
         self.canvas.create_text(780.0, 190.0, anchor="nw", text="word:", fill="#000000",
                                 font=("Roboto", 18 * -1))
         self.canvas.create_text(750.0, 40.0, anchor="nw", text="Isign", fill="#000000", font=("Roboto", 64 * -1))
-        #### textarea   later : textarea.insert(tk.END, *variable*)
         self.canvas.create_text(780.0, 250.0, anchor="nw", text="number of videos:", fill="#000000",
                                 font=("Roboto", 18 * -1))
         self.text_word = StringVar()
@@ -42,10 +45,8 @@ class DevGUI(Frame):
         self.options = []
         self.numOfCams = 0
         self.check_cameras()
-        # clicked.set(options[0])
         self.chooseCamera = ttk.OptionMenu(parent, self.clicked, self.options[0], *self.options)
         self.chooseCamera.place(x=780, y=150, width=100, height=30)
-        # create start/stop Btn - and texts
         self.startBtn_image = PhotoImage(file='assets/start_btn.png')
         self.goBack_image = PhotoImage(file='assets/goBack.png')
         self.startBtn = Button(parent, image=self.startBtn_image, borderwidth=0, highlightthickness=0,

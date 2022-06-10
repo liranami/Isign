@@ -46,8 +46,8 @@ model.add(Dense(32, activation='relu'))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.load_weights('model\\hap_israeli_sing_language_model.h5')
-model.fit(X_train, y_train, epochs=10, callbacks=[tb_callback])
+#model.load_weights('model\\hap_israeli_sing_language_model.h5')
+model.fit(X_train, y_train, epochs=10, batch_size=20, callbacks=[tb_callback])
 
 model.summary()
 
@@ -60,7 +60,7 @@ model.summary()
 #    if pre != actual:
 #        print(i)
 
-model.save('model\\hap_israeli_sing_language_model.h5')
+model.save('model\\new_israeli_sing_language_model.h5')
 # if we want to load the model
 # !!!!! first !!!!! run the model LSTM and Dense
 # !!!!! second !!!! compile the model

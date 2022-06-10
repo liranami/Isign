@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import os
 import mediapipe as mp
-from matplotlib import pyplot as plt
 
 ACTIONS = np.array(['שמח'])
 mp_holistic = mp.solutions.holistic  # MediaPipe Holistic model

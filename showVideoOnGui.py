@@ -1,13 +1,10 @@
 import tkinter as tk
-from tkinter import Frame
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
-import numpy as np
 import PIL
 import cv2
 import numpy as np
 import os
-import time
 import mediapipe as mp
 from words import Words
 
@@ -22,6 +19,7 @@ class StartVideo:
         self.mp_show = mp.solutions.drawing_utils  # Drawing utilities
         self.video_canvas = self.to_update.video_canvas
         self.dev = dev
+        # if we in live translate mode we need to load the model
         if self.dev is None:
             self.base_word = 'עומד'
             wordClass = Words()
@@ -30,7 +28,7 @@ class StartVideo:
             self.sequence = []
             self.sentence = []
             self.predictions = []
-            self.threshold = 0.8
+            self.threshold = 0.85
         else:
             pass
 
@@ -105,7 +103,6 @@ class StartVideo:
         #if len(self.sentence) > 8:
          #   self.sentence = self.sentence[-8:]
         if len(self.predictions) > 180:
-            #self.predictions = self.predictions[-80:]
             self.predictions = self.predictions[-40:]
 
         return self.base_word
@@ -178,8 +175,3 @@ class StartVideo:
             self.cap.release()
             # self.camera.set_stop(True)
             self.to_update.startBtn.config(state="normal")
-
-
-
-
-        # take from create video per word

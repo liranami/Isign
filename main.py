@@ -7,7 +7,8 @@ import developerLogin
 
 
 class MainApp(Tk):
-
+    """starting the main app
+        show_frame: reload frames on the main app"""
     def __init__(self):
         super().__init__()
         self.geometry("1024x600")
@@ -29,7 +30,9 @@ class MainApp(Tk):
 
 
 class Start(Frame):
-
+    """the main frame page of the application
+        Choose 'User' for translating from live video
+        Choose 'Developer' to create new video for dataset"""
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         self.controller = controller
@@ -47,15 +50,14 @@ class Start(Frame):
         self.userBtn_image = PhotoImage(file='assets/user.png')
         self.developerBtn_image = PhotoImage(file='assets/developer.png')
         self.info_img = Image.open('assets/info.png')
-        #self.info_resize = self.info_img.resize((25, 25), Image.ANTIALIAS)
         self.info_image = ImageTk.PhotoImage(self.info_img.resize((25, 25)))
-        #self.info_image = PhotoImage(file='assets/info1.png')
         self.userBtn = Button(parent, image=self.userBtn_image, borderwidth=0, highlightthickness=0,
                               command=lambda: controller.show_frame(userGUI.UserGUI(parent, controller, self)),
                               relief="flat")
         self.developerBtn = Button(parent, image=self.developerBtn_image, borderwidth=0, highlightthickness=0,
                                    command=lambda: controller.show_frame(
                                        developerLogin.dev_login(parent, controller, self)), relief="flat")
+        # General info for the app
         self.infoBtn = Button(parent, image=self.info_image,
                               command=lambda: messagebox.showinfo("showinfo",
                                                                   "Want to translate sign to word? enter "
@@ -75,7 +77,7 @@ class Start(Frame):
 
 
 if __name__ == '__main__':
-    gui = MainApp()
+    gui = MainApp()  # create app gui
     gui.resizable(False, False)
     gui.update()
     gui.mainloop()

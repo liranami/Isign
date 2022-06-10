@@ -1,12 +1,10 @@
 from tkinter import *
 from PIL import Image, ImageTk
-import main
-import devGUI
 import json
 import devGUI
 
 class dev_login(Frame):
-
+    """Login frame - only for developers"""
     def __init__(self, parent, controller, main):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -48,6 +46,7 @@ class dev_login(Frame):
         self.goBackBtn.place(x=26, y=32, width=22, height=20)
 
     def validUsers(self, check_details, password):
+        """Check if the username and password are correct"""
         data = open('LogIn\\users.json')
         users = json.load(data)
         for user in users:
@@ -57,7 +56,3 @@ class dev_login(Frame):
         else:
             self.canvas.create_text(715.0, 400.0, anchor="nw", text="invalid username or password", fill="red",
                                     font=("Roboto", 10 * -1))
-        #if user.get().lower() == 'liran' and password.get() == 'pass':
-        #    devGUI.changeToDevWin(logInGui)
-        #else:
-        #    print("bye!")

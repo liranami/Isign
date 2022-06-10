@@ -8,7 +8,10 @@ import threading
 
 
 class UserGUI(Frame):
-
+    """Show the live translation frame
+        Click 'start' to start translation
+        The video will appear in the left side
+        The translated words appear in bottom right side"""
     def __init__(self, parent, controller, main):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -27,17 +30,14 @@ class UserGUI(Frame):
         self.canvas.create_text(680.0, 242.0, anchor="nw", text="translated words :", fill="#000000",
                                 font=("Roboto", 18 * -1))
         self.canvas.create_text(750.0, 40.0, anchor="nw", text="Isign", fill="#000000", font=("Roboto", 64 * -1))
-        #### textarea   later : textarea.insert(tk.END, *variable*)
+        # textarea for translated words
         self.textarea = Text(parent, height=18, width=40)
         self.textarea.place(x=680, y=270)
-
-
-        # Drop down
+        # Drop down for numbers of cameras
         self.clicked = StringVar()
         self.options = []
         self.numOfCams = 0
         self.check_cameras()
-        # clicked.set(options[0])
         self.chooseCamera = ttk.OptionMenu(parent, self.clicked, self.options[0], *self.options)
         self.chooseCamera.place(x=680, y=150, width=100, height=30)
         # create start/stop Btn - and texts
@@ -67,7 +67,6 @@ class UserGUI(Frame):
 
     def startvideo(self):
         self.camera.set_stop(False)# = False
-        #self.check_cameras()
         if self.numOfCams == 0:
             messagebox.showerror("Error", "Please connect camera!")
         else:
@@ -75,23 +74,20 @@ class UserGUI(Frame):
             self.camera = StartVideo(self)
             self.startBtn.config(state="disabled")
             threading.Thread(target=self.camera.showVideo()).start()
-            #threading.Thread(target=camera.showVideo()).start()
-
 
     def stopvideo(self, back=None):
         self.camera.set_stop(True)# = True
         self.startBtn.config(state="normal")
         self.textarea.delete("1.0","end")
-
         if back:
             time.sleep(1)
-
 
     def clearCapture(self, capture):
         capture.release()
         cv2.destroyAllWindows()
 
     def camerasConnected(self):
+        """Checking numbers of cameras there connected and available"""
         n = 0
         for i in range(3):
             try:
