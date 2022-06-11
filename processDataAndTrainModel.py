@@ -27,27 +27,27 @@ for sing in ACTIONS:
 
 X = np.array(sequences)
 y = to_categorical(labels).astype(int)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15)
 print(X_train.shape)
 print(X_train[0].shape)
-# Build and train LSTM neural Network
+# Build and trainold LSTM neural Network
 log_dir = os.path.join('Logs')
 tb_callback = TensorBoard(log_dir=log_dir)
 
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=X_train[0].shape))
+model.add(LSTM(128, return_sequences=True, input_shape=X_train[0].shape))
 model.add(Dropout(0.2))
-model.add(LSTM(128, return_sequences=True, activation='relu'))
+model.add(LSTM(128, return_sequences=True))
 model.add(Dropout(0.2))
-model.add(LSTM(64, return_sequences=False, activation='relu'))
-model.add(Dense(64, activation='relu'))
+model.add(LSTM(64))
+model.add(Dense(64))
 model.add(Dropout(0.2))
-model.add(Dense(32, activation='relu'))
+model.add(Dense(32))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
 #model.load_weights('model\\hap_israeli_sing_language_model.h5')
-model.fit(X_train, y_train, epochs=10, batch_size=20, callbacks=[tb_callback])
+model.fit(X_train, y_train, epochs=50, batch_size=20, callbacks=[tb_callback])
 
 model.summary()
 
@@ -60,7 +60,7 @@ model.summary()
 #    if pre != actual:
 #        print(i)
 
-model.save('model\\new_israeli_sing_language_model.h5')
+model.save('model\\test_israeli_sing_language_model.h5')
 # if we want to load the model
 # !!!!! first !!!!! run the model LSTM and Dense
 # !!!!! second !!!! compile the model
@@ -71,5 +71,8 @@ model.save('model\\new_israeli_sing_language_model.h5')
 res = model.predict(X_test)
 ytrue = np.argmax(y_test, axis=1).tolist()
 yhat = np.argmax(res, axis=1).tolist()
+np.save('model\\test',ytrue)
+np.save('model\\res',yhat)
 print(multilabel_confusion_matrix(ytrue, yhat))
 print(accuracy_score(ytrue, yhat))
+print()

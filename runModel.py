@@ -43,18 +43,18 @@ def extract_keypoints(results):
     return np.concatenate([ left_hand, right_hand])  # (1662,)pose, face,
 
 model = Sequential()
-model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=(30, 126)))
+model.add(LSTM(128, return_sequences=True, input_shape=(30, 126)))
 model.add(Dropout(0.2))
-model.add(LSTM(128, return_sequences=True, activation='relu'))
+model.add(LSTM(128, return_sequences=True))
 model.add(Dropout(0.2))
-model.add(LSTM(64, return_sequences=False, activation='relu'))
-model.add(Dense(64, activation='relu'))
+model.add(LSTM(64))
+model.add(Dense(64))
 #model.add(Dropout(0.2))
-model.add(Dense(32, activation='relu'))
+model.add(Dense(32))
 model.add(Dense(ACTIONS.shape[0], activation='softmax'))
 
 model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-model.load_weights('model\\hap_israeli_sing_language_model.h5')
+model.load_weights('model\\test_israeli_sing_language_model.h5')
 
 
 sequence = []
@@ -73,15 +73,14 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         sequence = sequence[-30:]
         if len(sequence) == 30:
             res = model.predict(np.expand_dims(sequence, axis=0))[0]
-            #print(ACTIONS[np.argmax(res)], res)
+            print(ACTIONS[np.argmax(res)], np.round(res, decimals=2))
             predictions.append(np.argmax(res))
-
             if np.unique(predictions[-15:])[0] == np.argmax(res):
                 if res[np.argmax(res)] > threshold:
                     if len(sentence) > 0:
                         if ACTIONS[np.argmax(res)] != sentence[-1] and ACTIONS[np.argmax(res)]!='עומד':
                             sentence.append(ACTIONS[np.argmax(res)])
-                            sequence = sequence[-15:]
+                            sequence = sequence[-20:]
                             print(sentence)
                             if len(sentence) > 12:
                                 sentence = []

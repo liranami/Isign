@@ -63,7 +63,7 @@ class Start(Frame):
                                                                   "Want to translate sign to word? enter "
                                                                   "'User':\nJust click Start and the program will do "
                                                                   "the rest :)\n\nTo "
-                                                                  "create new video to train enter 'Developer'\n(need "
+                                                                  "create new video to trainold enter 'Developer'\n(need "
                                                                   "username and password):\nThere you will enter word "
                                                                   "that will represent the movement and number of "
                                                                   "video you want to capture\nin the end choose where "

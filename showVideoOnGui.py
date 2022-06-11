@@ -64,17 +64,17 @@ class StartVideo:
 
     def lstm_model(self):
         model = Sequential()
-        model.add(LSTM(128, return_sequences=True, activation='relu', input_shape=(30, 126)))
+        model.add(LSTM(128, return_sequences=True, input_shape=(30, 126)))
         model.add(Dropout(0.2))
-        model.add(LSTM(128, return_sequences=True, activation='relu'))
+        model.add(LSTM(128, return_sequences=True))
         model.add(Dropout(0.2))
-        model.add(LSTM(64, return_sequences=False, activation='relu'))
-        model.add(Dense(64, activation='relu'))
+        model.add(LSTM(64))
+        model.add(Dense(64))
         model.add(Dropout(0.2))
-        model.add(Dense(32, activation='relu'))
+        model.add(Dense(32))
         model.add(Dense(self.words.shape[0], activation='softmax'))
         model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-        model.load_weights('model\\updated_israeli_sing_language_model.h5')
+        model.load_weights('model\\test_israeli_sing_language_model.h5')
         return model
 
     def results_from_model(self, results):
